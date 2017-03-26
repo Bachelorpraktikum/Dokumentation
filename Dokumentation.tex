@@ -1,0 +1,254 @@
+\documentclass[accentcolor=tud0b,12pt,paper=a4]{tudreport}
+
+\usepackage[utf8]{inputenc}
+\usepackage{ngerman}
+\usepackage{parcolumns}
+\usepackage{listings}
+\usepackage{color}
+
+\setlength{\parindent}{0pt}
+
+\newcommand{\titlerow}[2]{
+	\begin{parcolumns}[colwidths={1=.15\linewidth}]{2}
+		\colchunk[1]{#1:} 
+		\colchunk[2]{#2}
+	\end{parcolumns}
+	\vspace{0.2cm}
+}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+	language=Java,
+	aboveskip=3mm,
+	belowskip=3mm,
+	showstringspaces=false,
+	columns=flexible,
+	basicstyle={\small\ttfamily},
+	numbers=none,
+	numberstyle=\tiny\color{gray},
+	keywordstyle=\color{blue},
+	commentstyle=\color{dkgreen},
+	stringstyle=\color{mauve},
+	breaklines=true,
+	breakatwhitespace=true,
+	tabsize=3
+}
+
+\title{Visualisierung eines Modelles für den Eisenbahnbetrieb}
+\subtitle{Dokumentation} % TODO besserer Titel?
+\subsubtitle{%
+	\titlerow{Team}{%
+		Björn Petersen <TODO>\\
+		Yannick Roder <TODO>\\
+		Torben Carstens <TODO>\\
+		Christian Schaarschmidt <TODO>\\
+		Johannes Semsch <TODO>}
+	\titlerow{Auftraggeber}{%
+		Eduard Kamburjan <kamburjan@cs.tu-darmstadt.de>\\
+		Fachgebiet Software Engineering Group\\
+		Fachbereich Informatik}}
+\institution{Bachelor-Praktikum WiSe~16/17\\Fachbereich Informatik}
+
+\begin{document}
+
+	\maketitle
+	\tableofcontents
+	
+	\chapter{Einleitung}
+		%TODO ein paar Worte darüber verlieren, was in diesem Dokument enthalten ist
+		Dieses Dokument bietet, zusätzlich zu den JavaDocs, Dokumentation und Erläuterung des "`VisualisierbaR"'-Source-Codes.
+		
+	\section{Das Modell}
+		Der Auftraggeber hat in der Programmiersprache "`ABS"' ein Modell des Eisenbahnbetriebs erstellt. Dieses Modell kann formal auf verschiedene Eigenschaften überprüft werden, aber auch simuliert. Die Simulation ist der für dieses Programm relevante Teil.
+		
+		\subsection{Output-Format}
+			Der Output des Modells beinhaltet alle benötigten Informationen, um die Simulation zu visualisieren. Abstrakt beschrieben hat er das folgende Format:\\
+			
+			\begin{enumerate}
+				\item Nodes mit eindeutigen Namen und Koordinaten werden deklariert
+				\item Edges mit eindeutigen Namen und den Namen der durch die jeweilige Edge verbundenen Nodes werden deklariert
+				\item Elements (siehe~\ref{elements} Elemente) mit eindeutigen Namen werden auf einer der zuvor definierten Nodes mit einem initialen Status deklariert
+				\item Züge mit eindeutigen Namen, kurzen Namen und einer Länge in Metern werden definiert
+				\item Events (siehe~\ref{events} Events) werden deklariert
+			\end{enumerate}
+			
+			
+		\subsection{Elemente}
+		\label{elements}
+			Elemente sind verschiedenste Objekte entlang der Eisenbahnstrecke, die für das Modell von Bedeutung sind. Z.B. können dies Signale oder Weichenpunkte sein.\\
+			
+			Elemente können einen von drei Status haben:
+			\begin{itemize}
+				\item NOSIG - undefiniert / uninitialisiert
+				\item STOP  - nicht aktiv
+				\item FAHRT - aktiv
+			\end{itemize}
+		
+			Intern (im Modell) sind Elemente meist Teil eines "`Signals"'. So gehören zum Beispiel immer ein \textit{Hauptsignal}-Element und ein \textit{Vorsignal}-Element zusammen zu einem Signal. Ein weiteres Beispiel sind \textit{Weichenpunkte}, bei denen immer drei \textit{Weichenpunkt}-Elemente zu einer Weiche gehören.\\
+			Problematisch für dieses Programm kann hier werden, dass diese Zugehörigkeit von Elementen zu Signalen nicht vom Modell in den Logs preisgegeben wird. Für die meisten Elemente ist dies im Rahmen der Visualisierung irrelevant, bei Weichen werden drei aufeinanderfolgende \textit{Weichenpunkt}-Deklarationen als eine Weiche ausgewertet.
+
+		\subsection{Zeit}
+			Die Simulationszeit wird im Modell in Sekunden als rationale Zahl betrachtet (ausgegeben als Integer oder Bruch). Dieses Programm vereinfacht diese Darstellung zu Millisekunden als natürliche Zahl.
+
+		\subsection{Events}
+		\label{events}
+			Events modifizieren den Status eines Objekts in der Simulation. Zu allen Events wird der Zeitpunkt angegeben.\\
+			
+			"`CH"'-Events beschreiben Veränderungen des Status eines Elements (zu den Status siehe~\ref{elements} Elemente)\\
+			"`MV"'-Events beschreiben Veränderungen des Status eines Zuges (siehe ~\ref{train} Train)
+
+	\section{Terminologie}
+		\begin{tabular}{| p{3cm} | p{13cm} |}
+			\hline
+			Model & das in "`ABS"' geschriebene Modell des Auftraggebers \\ \hline
+			Log & eine Log-Datei des Models, enthält alle Informationen über den Verlauf einer Simulation \\ \hline
+			API & die Software-API, die vom Programm zur Verfügung gestellt wird ("`public"' Klassen / Methoden) \\ \hline
+			Client & Nutzer der API innerhalb des Programms \\ \hline
+			Client-Code & Code, der die API aus einer anderen Klasse oder einem anderen Package heraus nutzt \\
+			\hline
+		\end{tabular}
+		
+	 	
+	\chapter{Allgemeine Hinweise}
+	
+	\section{Systemvoraussetzungen}
+	Das Programm benötigt zur Ausführung JavaFX und mindestens Java 8.\\
+	Für die Live-Simulation wird Linux benötigt.
+	
+	\section{Ausführung}
+	Es existieren zwei Kommandozeilenargumente:
+	\begin{itemize}
+		\item "`\texttt{-{}-pipe}"' kann genutzt werden, um Model-Output direkt in das Programm zu pipen
+		\begin{itemize}
+			\item Beispiel: \texttt{cat logFile.zug | java -jar visualisierbar.jar -{}-pipe}
+		\end{itemize}
+		\item "`\texttt{-{}-live}"' wie "`\texttt{-{}-pipe}"', nur dass eine Live-Simulations-Verbindung zum Model gestartet wird
+		\begin{itemize}
+			\item Beispiel: \texttt{./runRest | java -jar visualisierbar.jar -{}-live}
+		\end{itemize}
+	\end{itemize}
+	
+	\section{Entwicklung}
+	Für die Arbeit am Source-Code wird die Nutzung von IntelliJ IDEA empfohlen.\\
+	Die meisten Reporting-Maven-Plugins werden nur im "`\texttt{site}"'-Profil ausgeführt. Das heißt für einen vollständigen Report sollte "`\texttt{mvn site -P site}"' ausgeführt werden.\\
+	
+	\chapter{\textit{model}-Package}
+	Das \textit{model}-Package beinhaltet Datenstrukturen, welche die Datenstrukturen, mit denen das Model arbeitet, wiederspiegeln.
+	Dieses Package enthält keinen GUI-Code und ist damit sehr gut automatisch testbar.
+	
+	\section{Context}
+		\subsection{Funktion}
+			Im Wesentlichen bietet ein Context-Objekt den Zugriff auf alle Objekte in einem Graphen.\\
+			Jede GraphObject-Implementierung hält genau eine Factory pro Context. Hierbei wird der Context als Map-Key nur mit einer "`weak Reference"' gespeichert. GraphObject-Implementierungen dürfen keine "`strong Reference"' auf einen Context halten, da dies zu einem Memory-Leak führen kann.\\
+			Die Factory verwaltet alle Instanzen der jeweiligen Implementierung und stellt sicher, dass es keine Duplikate gibt.\\
+			
+			Gibt es keine Referenzen mehr auf einen Context in Client-Code, wird er garbage-collected. Damit werden auch alle mit ihm assoziierten Factories und damit alle Instanzen von GraphObjects garbage-collected, die nicht mehr in Client-Code genutzt werden.
+			
+			Ein Context wird innerhalb des model-Package nur für diesen Zweck genutzt. Die einzige Funktion, die Context für dieses Package zur Verfügung stellt, ist seine Objektidentität.
+			
+			Für Clients bietet ein Context noch Convenience-Methoden, deren Funktion auch ohne diese Methoden erreicht werden könnte.			
+			
+		\subsection{Nutzung}
+			Über eine Instanz von Context (im Folgenden einfach Context) kann auf alle damit assoziierten Objekte zugegriffen werden.
+			GraphObject-Implementierungen (beispielsweise Node) bieten eine statische Methode \texttt{in(Context)} an, welche die jeweilige Instanz einer Factory zurückgibt. Die Factory wiederum bietet verschiedene Methoden, um Instanzen der GraphObject-Implementierung zu erhalten. Alle Factories bieten eine getAll()-Methode, die eine Collection aller Instanzen zurückgibt. Weiterhin gibt es für gewöhnlich verschiedene Methoden, um neue Instanzen zu erstellen oder bestehende über den Namen abzurufen.\\
+			
+			Beispiel für die Erstellung einer neuen Node mit dem Namen "`node1"' an Position (4, 2):\\
+			\begin{lstlisting}
+			// (somewhere) Context context = new Context();
+			// ...
+			Coordinates position = new Coordinates(4, 2);
+			Node node1 = Node.in(context).create("node1", position);		
+			\end{lstlisting}
+			
+			Beispiel für den Abruf der Node-Instanz mit dem Namen "`node1"' aus dem vorigen Beispiel:\\
+			\begin{lstlisting}
+			Node node1 = Node.in(context).get("node1");
+			\end{lstlisting}
+		
+		\subsection{Rechtfertigung}
+			Da Namen von Objekten im Graph eindeutig sind, ergibt es Sinn, alle Instanzen einer Klasse zu verwalten und nur ein Objekt pro Namen zu erstellen. Hierfür bietet sich eine Variante des Factory-Patterns an, bei der es für jeden Typen nur eine Instanz der dazugehörigen Factory gibt (Singleton).
+			Klassen, die solche Objekte mit eindeutigem Namen repräsentieren, werden im Folgenden "`GraphObjects"' genannt, analog zum GraphObject-Interface.
+			Allerdings sind Namen natürlich nur innerhalb eines Graphen eindeutig, nicht global. Für dieses Problem wurden folgende Lösungen betrachtet:
+			\begin{enumerate}
+				\item Naive Herangehensweise: alle Factories werden beim Wechsel des visualisierten Graphen zurückgesetzt.
+				\begin{itemize}
+					\item Wenig Mehraufwand beim Programmieren einer Factory für ein GraphObject
+					\item Viel Aufwand beim Graph-Wechsel. Client muss alle Factories zurücksetzen. Alternativ existiert eine Utility-Klasse mit einer Methode, um alle Factories zurückzusetzen. Dennoch fehleranfällig, denn eine zentrale Stelle muss alle GraphObjects kennen.
+					\item Es kann nur ein Graph zur Zeit im Programm existieren
+				\end{itemize}
+				\item Eine Klasse (z.B. "`Graph"') repräsentiert einen Graphen und erstellt bzw. verwaltet alle Instanzen der dazugehörigen Objekte.
+				\begin{itemize}
+					\item Verringert Aufwand für Erstellung neuer GraphObjects, da nicht jede Implementierung eine eigene Factory braucht
+					\item Sehr geringer Aufwand beim Graph-Wechsel. Gibt es keine Referenzen mehr zum Graph-Objekt, wird es automatisch garbage-collected
+					\item Die Graph-Klasse muss alle GraphObjects kennen (Gottklassenproblem) 
+					\item Mehrere Graphen können gleichzeitig existieren
+				\end{itemize}
+				\item Erstellen einer "`Context"'-Klasse, die den Kontext eines Graphen repräsentiert. GraphObjects halten genau eine Factory pro Context-Instanz in einer WeakHashMap.
+				\begin{itemize}
+					\item Größter Mehraufwand bei der Implementierung von GraphObjects
+					\item Sehr geringer Aufwand beim Graph-Wechsel. Gibt es keine Referenzen mehr zum Context-Objekt, werden alle Factories und damit auch die Instanzen von GraphObjects, die sie verwalten, garbage-collected
+					\item Die Context-Klasse benötigt keine Kenntnis über Implementierungen von GraphObjects. Die einzige Funktion, die benötigt wird, ist die Objektidentität über die equals()- und hashCode()-Funktionen
+					\item Mehrere Graphen können gleichzeitig existieren
+				\end{itemize}
+			\end{enumerate}
+			
+			Nach Erwägung der Vor- und Nachteile lief es auf eine Wahl zwischen Lösung 2 und 3 hinaus. Um das Gottklassenproblem zu vermeiden, wurde Lösung 3 gewählt.
+				
+	\section{Element}
+		Elements haben die Besonderheit, dass sie nicht komplett immutable sind. Jedes Element hat eine \textit{State-Property}, die den aktuellen Zustand hält. Die Zeit für diesen Zustand ist für alle Elements gleichgeschaltet und wird in der Factory verwaltet. Die Element-Factory verwaltet auch die Events für alle Elements. Die aktuelle Zeit für alle Elements kann über die \texttt{setTime(int)} der jeweiligen Factory gesetzt werden.\\
+		
+		\subsection{Symbole}
+			Um die nötige Qualität auch bei hohen Zoomstufen zu erhalten, werden Vektorgrafiken für Elementsymbole verwendet. Da JavaFX keine direkte Unterstützung für SVG-Dateien bietet, müssen diese zuerst in das FXML-Format umgewandelt werden. Für diese Umwandlung existiert z.B. das Tool "`svg2fxml"'.
+			Das besagte Tool umhüllt das erzeugte \textit{SVGPath}-Objekt allerdings mit einer \textit{Group}; diese \textit{Group} muss gelöscht / entpackt werden, um einen \textit{SVGPath} und damit ein \textit{Shape}-Objekt zu erhalten.
+		
+	\section{Train}
+	\label{train}
+		Trains sind, wie die meisten Klassen im model-Package, immutable. Der Zustand (Geschwinigkeit, Position) eines Zuges wird durch das \textit{Train.State}-Interface modelliert. Instanzen des Interfaces werden durch \textit{TrainEvents} erstellt. Somit gibt es für jeden der diskreten Zeitpunkte, an denen ein Event stattfindet, jeweils einen Zustand.
+		
+		\subsection{InterpolatableState}
+			\textit{IterpolatableState} ist die konkrete Implementierung des \textit{Train.State}-Interfaces.
+			Die Klasse ist nicht Teil der öffentlichen API.\\
+			
+			Diese Implementierung erweitert das \textit{Train.State}-Interface um eine\\
+			\texttt{interpolate(int, InterpolatableState)}-Methode. Diese bietet die Möglichkeit, auf Grundlage zweier States einen State für einen Zeitpunkt dazwischen zu interpolieren.\\
+			Da die Klasse nicht öffentlich ist, wird diese Methode in Client-Code nur indirekt über die \texttt{Train.getState(int)}-Methode genutzt.
+			
+			Beispiel:\\
+			\begin{lstlisting}
+			// state zum Zeitpunkt 10
+			InterpolatableState state1 = ...;
+			// state zum Zeitpunkt 20
+			InterpolatableState state2 = ...;
+			
+			// Zeitpunkt, fuer den wir den State eigentlich wollen
+			int targetTime = 15;
+			Train.State targetState = state1.interpolate(targetTime, state2);
+			\end{lstlisting}
+			
+		
+		\subsection{TrainEvent}
+		\label{trainevent}
+			TrainEvents sind direkte Repräsentationen der Train-Events des Models. Für jedes Event, das einen Zug betrifft, existiert eine TrainEvent-Implementierung.
+			TrainEvents sind immutable. Der State, den ein TrainEvent erstellt, kann aber zwischen Aufrufen der \texttt{getState()}-Methode variieren. Grund dafür ist, dass neue Events, die nach dem ersten Aufruf erstellt wurden, Einfluss auf die Interpretation voriger Events haben können.\\
+			Das aktuell einzige Beispiel hierfür ist das \textit{Init}-Event, das einen Zug auf einer Edge initialisiert. Erst wenn später ein \textit{Reach}-Event existiert, kann die tatsächliche Ausrichtung / Fahrtrichtung des Zuges bestimmt werden.
+		
+		
+	\chapter{\textit{datasource}-Package}
+	In diesem Package sind alle möglichen Datenquellen zu finden.
+	
+	Eine DataSource-Implementierung erstellt zuerst einen Context und dann Instanzen von Graph-Objekten im selbigen.\\
+	Die Datenquelle kann hierbei entweder direkt der Output des Models, welches als Subprocess läuft, sein, oder eine Log-Datei.
+	In beiden Fällen wird das Log mit Hilfe von ANTLR geparsed und die entsprechenden Objekte erstellt (siehe\textbf{~\ref{logparser} logparser-Package}).
+	
+	\chapter{\textit{logparser}-Package}
+	\label{logparser}
+	Dieses Package enthält auf den ersten Blick nur die GraphParser-Klasse, die mit Hilfe des ANTLR-Parsers den Output des Models parsed und entsprechende Graph-Objekte und Events erstellt.\\
+	Tatsächlich werden aber auch alle von ANTLR generierten Klassen in diesem Package generiert. Diese Klassen werden im GraphParser genutzt und sind nicht Teil der öffentlichen API des Packages.
+		
+	\chapter{\textit{view}-Package}
+	Dieses Package (und seine Sub-Packages) enthält den GUI-Code, der Nutzen von den Datenstrukturen im \textit{model}-Package macht.
+	
+\end{document}
