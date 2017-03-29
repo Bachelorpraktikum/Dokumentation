@@ -253,6 +253,13 @@
 	
 	\chapter{Database}
 	\label{database}
+		
+		Beispiel:\\
+		\begin{lstlisting}
+		VorSignal z1_vs1 = new local VorSignalImpl(ez1_1);
+		HauptSignal z1_hs1 = new local HauptSignalImpl(z1_03, ez1_2);	
+		Signal z1_s1 = new local SignalImpl(z1_hs1,z1_vs1,z1_ss1, "z1_s1");
+		\end{lstlisting}
 		\subsection{\textit{database}-Package}
 		\subsection{Voraussetzungen}
 		Das Programm geht davon aus, dass die ABS-Toolchain (https://github.com/abstools/abstools) auf dem System installiert ist und die ausführbaren Dateien, vor allem der Compiler (\textit{absc}), im \textit{PATH} vorhanden ist.
