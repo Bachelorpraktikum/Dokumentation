@@ -164,7 +164,7 @@
 			\end{lstlisting}
 			
 			Beispiel für den Abruf der Node-Instanz mit dem Namen "`node1"' aus dem vorigen Beispiel:\\
-			\begin{lstlisting}
+			\begin{lstlisting}	
 			Node node1 = Node.in(context).get("node1");
 			\end{lstlisting}
 		
@@ -263,6 +263,9 @@
 		Signal z1_s1 = new local SignalImpl(z1_hs1,z1_vs1,z1_ss1, "z1_s1");
 		\end{lstlisting}
 		\subsection{\textit{database}-Package}
+		Dieses Package enthält ein \textit{model}-Package, welches Klassen enthält, die die Struktur in der Datenbank widerspiegeln. Ebenfalls enthält dieses Package Klassen, welche mit der Datenbank kommunizieren, und das ABS-Modell exportieren.
+		\subsection{\textit{database.model}-Package}
+		Dieses Package enthält sowohl Klassen, welche die Struktur aus der Datenbank widerspiegeln, als auch Interfaces welche sie exportierbar machen und ein gemeinsames Interface bereitstellen.
 		\subsection{Voraussetzungen}
 		Das Programm geht davon aus, dass die ABS-Toolchain (https://github.com/abstools/abstools) auf dem System installiert ist und die ausführbaren Dateien, vor allem der Compiler (\textit{absc}), im \textit{PATH} vorhanden ist.
 	
