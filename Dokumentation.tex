@@ -245,28 +245,32 @@
 	
 	\chapter{\textit{logparser}-Package}
 	\label{logparser}
-	Dieses Package enthält auf den ersten Blick nur die GraphParser-Klasse, die mit Hilfe des ANTLR-Parsers den Output des Models parsed und entsprechende Graph-Objekte und Events erstellt.\\
-	Tatsächlich werden aber auch alle von ANTLR generierten Klassen in diesem Package generiert. Diese Klassen werden im GraphParser genutzt und sind nicht Teil der öffentlichen API des Packages.
+		Dieses Package enthält auf den ersten Blick nur die GraphParser-Klasse, die mit Hilfe des ANTLR-Parsers den Output des Models parsed und entsprechende Graph-Objekte und Events erstellt.\\
+		Tatsächlich werden aber auch alle von \textit{ANTLR} generierten Klassen in diesem Package generiert. Diese Klassen werden im GraphParser genutzt und sind nicht Teil der öffentlichen API des Packages.
 		
 	\chapter{\textit{view}-Package}
 	Dieses Package (und seine Sub-Packages) enthält den GUI-Code, der Nutzen von den Datenstrukturen im \textit{model}-Package macht.
 	
-	\chapter{Database}
+	\chapter{Datenbank}
 	\label{database}
-		Die Datenbank wurde vom Auftraggeber bereitgestellt. Die Datenbank wurde im \textit{database}-Package gewrappt, die Daten werden gefiltert, bevor sie in das Modell übernommen werden.\\
-		Die Daten aus der Datenbank werden in ein ABS-Modell konvertiert, dieses wird in eine \textit{Run}-Methode eingebunden. Diese wird in eine \textit{Run.abs}-Datei exportiert.
+		Die Datenbank wurde vom Auftraggeber bereitgestellt. Der Zugriff darauf erfolgt im \textit{database}-Package (siehe~\ref{dbpackage}). Die Daten werden gefiltert, bevor sie in das Modell übernommen werden.\\
+		Die Daten aus der Datenbank werden in ein \textit{ABS}-Modell konvertiert, dieses wird in eine \textit{Run}-Methode eingebunden. Diese wird in eine \textit{Run.abs}-Datei exportiert.\\
 		
-		Beispiel:\\
+		Beispiel für resultierenden \textit{ABS}-Code:\\
 		\begin{lstlisting}
 		VorSignal z1_vs1 = new local VorSignalImpl(ez1_1);
 		HauptSignal z1_hs1 = new local HauptSignalImpl(z1_03, ez1_2);	
 		Signal z1_s1 = new local SignalImpl(z1_hs1,z1_vs1,z1_ss1, "z1_s1");
 		\end{lstlisting}
-		\subsection{\textit{database}-Package}
-		Dieses Package enthält ein \textit{model}-Package, welches Klassen enthält, die die Struktur in der Datenbank widerspiegeln. Ebenfalls enthält dieses Package Klassen, welche mit der Datenbank kommunizieren, und das ABS-Modell exportieren.
-		\subsection{\textit{database.model}-Package}
-		Dieses Package enthält sowohl Klassen, welche die Struktur aus der Datenbank widerspiegeln, als auch Interfaces welche sie exportierbar machen und ein gemeinsames Interface bereitstellen.
+
 		\subsection{Voraussetzungen}
-		Das Programm geht davon aus, dass die ABS-Toolchain (https://github.com/abstools/abstools) auf dem System installiert ist und die ausführbaren Dateien, vor allem der Compiler (\textit{absc}), im \textit{PATH} vorhanden ist. Alternativ kann der Pfad der Toolchain auch über die Konfigurations-Datei bereitgestellt werden.
+			Das Programm geht davon aus, dass die \textit{ABS}-Toolchain (https://github.com/abstools/abstools) auf dem System installiert ist und die ausführbaren Dateien, vor allem der Compiler (\textit{absc}), im \textit{PATH} vorhanden sind. Alternativ kann der Pfad der Toolchain auch über die Konfigurations-Datei bereitgestellt werden.
+		
+		\subsection{\textit{database}-Package}
+		\label{dbpackage}
+			Dieses Package enthält ein \textit{model}-Package, welches Klassen enthält, die die Struktur in der Datenbank widerspiegeln. Ebenfalls enthält dieses Package Klassen, welche mit der Datenbank kommunizieren, und das \textit{ABS}-Modell exportieren.
+		
+		\subsection{\textit{database.model}-Package}
+			Dieses Package enthält sowohl Klassen, welche die Struktur aus der Datenbank widerspiegeln, als auch Interfaces welche sie exportierbar machen und ein gemeinsames Interface bereitstellen.
 	
 \end{document}
