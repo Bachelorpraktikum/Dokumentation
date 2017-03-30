@@ -253,7 +253,29 @@
 		Für weitere Informationen wird die ANTLR-Dokumentation empfohlen.
 		
 	\chapter{\textit{view}-Package}
-	Dieses Package (und seine Sub-Packages) enthält den GUI-Code, der Nutzen von den Datenstrukturen im \textit{model}-Package macht.
+		Dieses Package (und seine Sub-Packages) enthält den GUI-Code, der Nutzen von den Datenstrukturen im \textit{model}-Package macht.
+	
+	\section{\textit{view.sourcechooser}-Package}
+		Dieses Package enthält den GUI-Code für das Auswahlfenster zu Beginn des Programms.\\
+
+		Jede Implementierung des \textit{SourceChooser}-Interfaces fungiert als Controller für einen Tab im Auswahlfenster.
+		Für gewöhnlich sollte hier für jede Implementierung im \textit{datasource}-Package eine Implementierung des \textit{SourceChooser}-Interfaces existieren.\\
+		
+		Die ausgewählte Datenquelle wird bereits hier auf Validität kontrolliert und (mindestens Teilweise) geparsed.
+		
+	\section{\textit{view.graph}-Package}
+		In diesem Package wird die Visualisierung des Graphen (Nodes, Edges, Elements) verwaltet.\\
+		
+		Erster Anlaufpunkt ist die \textit{Graph}-Klasse, die für einen \textit{Context} mithilfe eines \textit{CoordinatesAdapter} alle \textit{GraphShape}-Objekte erstellt.
+		Ein GraphShape repräsentiert ein oder mehrere Objekte im Graph gleichen Typs. Zum Beispiel kann ein GraphShape mehrere Elemente repräsentieren. Alle GraphShape-Implementierungen sind in diesem oder dem \textit{view.graph.elements}-Package zu finden.
+		
+	\subsection{\textit{view.graph.adapter}-Package}
+		Hier sind das \textit{CoordinatesAdapter}-Interface sowie Implementierungen davon zu finden.
+		
+		Ein \textit{CoordinatesAdapter} wird benutzt, um die Koordinaten aus dem Model in Koordinaten im angezeigten Graphen zu übersetzen.\\
+		
+		Zu beachten ist, dass jede Implementierung einen Graphen beliebiger Größe erstellen kann. Eine Implementierung könnte einen Graphen also komplett auf die Koordinaten im Bereich von (0.0, 0.0) bis (1.0, 1.0) abbilden, während eine andere Implementierung den selben Graphen auf Koordinaten von (-1000.0, -1000.0) bis (1000.0, 1000.0) abbildet. Entsprechend müssen Objekte am Graphen (z.B. Elemente) skaliert und positioniert werden. Dafür gibt es die \texttt{getCalibrationBase()}-Methode als Skalierungsfaktor.
+				
 	
 	\chapter{Datenbank}
 	\label{database}
